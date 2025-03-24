@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import AnimatedTransition from '@/components/ui-elements/AnimatedTransition';
 import {
@@ -48,10 +47,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DatePicker } from '@/components/ui/calendar';
 import { format } from 'date-fns';
+import { searchBovespaStocks } from '@/data/bovespaStocks';
+import { Autocomplete, type AutocompleteOption } from '@/components/ui/autocomplete';
 
-// Mock transaction data
 const transactions = [
   {
     id: 1,
@@ -188,8 +187,38 @@ const Transactions = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [brokerFilter, setBrokerFilter] = useState<string>('all');
   const [open, setOpen] = useState(false);
+  
+  const [transactionType, setTransactionType] = useState('buy');
+  const [transactionDate, setTransactionDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [category, setCategory] = useState('Ações');
+  const [assetTickerInput, setAssetTickerInput] = useState('');
+  const [assetName, setAssetName] = useState('');
+  const [quantity, setQuantity] = useState('');
+  const [price, setPrice] = useState('');
+  const [broker, setBroker] = useState('XP Investimentos');
+  
+  const [stockOptions, setStockOptions] = useState<AutocompleteOption[]>([]);
 
-  // Get unique categories and brokers for filters
+  useEffect(() => {
+    if (assetTickerInput.length > 1) {
+      const results = searchBovespaStocks(assetTickerInput);
+      setStockOptions(
+        results.map(stock => ({
+          value: stock.ticker,
+          label: stock.ticker,
+          detail: stock.name
+        }))
+      );
+    } else {
+      setStockOptions([]);
+    }
+  }, [assetTickerInput]);
+
+  const handleStockSelect = (option: AutocompleteOption) => {
+    setAssetTickerInput(option.value);
+    setAssetName(option.detail || '');
+  };
+
   const categories = Array.from(new Set(transactions.map((t) => t.category)));
   const brokers = Array.from(new Set(transactions.map((t) => t.broker)));
 
@@ -201,18 +230,14 @@ const Transactions = () => {
   };
 
   const filteredTransactions = transactions.filter((transaction) => {
-    // Search filter
     const searchMatch =
       transaction.asset.toLowerCase().includes(searchQuery.toLowerCase()) ||
       transaction.name.toLowerCase().includes(searchQuery.toLowerCase());
 
-    // Type filter
     const typeMatch = typeFilter === 'all' || transaction.type === typeFilter;
 
-    // Category filter
     const categoryMatch = categoryFilter === 'all' || transaction.category === categoryFilter;
     
-    // Broker filter
     const brokerMatch = brokerFilter === 'all' || transaction.broker === brokerFilter;
     
     return searchMatch && typeMatch && categoryMatch && brokerMatch;
@@ -274,6 +299,20 @@ const Transactions = () => {
         );
       default:
         return null;
+    }
+  };
+
+  const handleDialogOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      setTransactionType('buy');
+      setTransactionDate(format(new Date(), 'yyyy-MM-dd'));
+      setCategory('Ações');
+      setAssetTickerInput('');
+      setAssetName('');
+      setQuantity('');
+      setPrice('');
+      setBroker('XP Investimentos');
     }
   };
 
@@ -363,7 +402,7 @@ const Transactions = () => {
                   Exportar
                 </Button>
                 
-                <Dialog open={open} onOpenChange={setOpen}>
+                <Dialog open={open} onOpenChange={handleDialogOpenChange}>
                   <DialogTrigger asChild>
                     <Button size="sm" className="h-9 gap-1">
                       <PlusCircle size={16} />
@@ -382,7 +421,10 @@ const Transactions = () => {
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Tipo</label>
-                          <Select defaultValue="buy">
+                          <Select 
+                            value={transactionType} 
+                            onValueChange={setTransactionType}
+                          >
                             <SelectTrigger>
                               <SelectValue placeholder="Selecione o tipo" />
                             </SelectTrigger>
@@ -397,14 +439,21 @@ const Transactions = () => {
                         
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Data</label>
-                          <Input type="date" defaultValue={format(new Date(), 'yyyy-MM-dd')} />
+                          <Input 
+                            type="date" 
+                            value={transactionDate} 
+                            onChange={(e) => setTransactionDate(e.target.value)} 
+                          />
                         </div>
                       </div>
                       
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Categoria</label>
-                          <Select defaultValue="Ações">
+                          <Select 
+                            value={category} 
+                            onValueChange={setCategory}
+                          >
                             <SelectTrigger>
                               <SelectValue placeholder="Selecione a categoria" />
                             </SelectTrigger>
@@ -419,30 +468,63 @@ const Transactions = () => {
                         
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Ativo</label>
-                          <Input placeholder="PETR4" />
+                          {category === 'Ações' ? (
+                            <Autocomplete 
+                              options={stockOptions}
+                              value={assetTickerInput}
+                              onChange={setAssetTickerInput}
+                              onOptionSelect={handleStockSelect}
+                              placeholder="Digite o ticker (ex: PETR4)"
+                              emptyMessage="Nenhum ativo encontrado"
+                            />
+                          ) : (
+                            <Input 
+                              placeholder="PETR4" 
+                              value={assetTickerInput}
+                              onChange={(e) => setAssetTickerInput(e.target.value)}
+                            />
+                          )}
                         </div>
                       </div>
                       
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Nome do ativo</label>
-                        <Input placeholder="Petrobras PN" />
+                        <Input 
+                          placeholder="Petrobras PN" 
+                          value={assetName}
+                          onChange={(e) => setAssetName(e.target.value)}
+                        />
                       </div>
                       
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Quantidade</label>
-                          <Input type="number" placeholder="100" />
+                          <Input 
+                            type="number" 
+                            placeholder="100" 
+                            value={quantity}
+                            onChange={(e) => setQuantity(e.target.value)}
+                          />
                         </div>
                         
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Preço unitário</label>
-                          <Input type="number" step="0.01" placeholder="32.50" />
+                          <Input 
+                            type="number" 
+                            step="0.01" 
+                            placeholder="32.50" 
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                          />
                         </div>
                       </div>
                       
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Corretora</label>
-                        <Select defaultValue="XP Investimentos">
+                        <Select 
+                          value={broker} 
+                          onValueChange={setBroker}
+                        >
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione a corretora" />
                           </SelectTrigger>
