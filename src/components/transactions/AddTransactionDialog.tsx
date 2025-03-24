@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Autocomplete, type AutocompleteOption } from '@/components/ui/autocomplete';
-import { searchStocks } from '@/services/brapiService';
+import { searchStocks, searchStocksByType } from '@/services/brapiService';
 import { toast } from 'sonner';
 
 interface AddTransactionDialogProps {
@@ -41,20 +41,34 @@ const AddTransactionDialog = ({ open, onOpenChange }: AddTransactionDialogProps)
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const fetchStocks = async () => {
-      if (assetTickerInput.length > 1 && category === 'Ações') {
+    const fetchAssets = async () => {
+      if (assetTickerInput.length > 1) {
         setIsLoading(true);
         try {
-          const stocks = await searchStocks(assetTickerInput);
+          let assets = [];
+          
+          if (category === 'Ações') {
+            assets = await searchStocksByType('stock', assetTickerInput);
+          } else if (category === 'FIIs') {
+            assets = await searchStocksByType('fund', assetTickerInput);
+          } else if (category === 'Cripto') {
+            // Aqui você poderia implementar uma busca específica para criptomoedas
+            // ou manter a busca genérica
+            assets = await searchStocks(assetTickerInput);
+          } else {
+            // Para outras categorias ou busca genérica
+            assets = await searchStocks(assetTickerInput);
+          }
+          
           setStockOptions(
-            stocks.map(stock => ({
-              value: stock.symbol,
-              label: stock.symbol,
-              detail: stock.shortName || stock.longName || ''
+            assets.map(asset => ({
+              value: asset.symbol || '',
+              label: asset.symbol || '',
+              detail: asset.shortName || ''
             }))
           );
         } catch (error) {
-          console.error('Erro ao buscar ações:', error);
+          console.error('Erro ao buscar ativos:', error);
           setStockOptions([]);
         } finally {
           setIsLoading(false);
@@ -66,7 +80,7 @@ const AddTransactionDialog = ({ open, onOpenChange }: AddTransactionDialogProps)
 
     // Usar um timeout para evitar muitas chamadas API durante a digitação
     const timeoutId = setTimeout(() => {
-      fetchStocks();
+      fetchAssets();
     }, 300);
 
     return () => clearTimeout(timeoutId);
@@ -174,18 +188,19 @@ const AddTransactionDialog = ({ open, onOpenChange }: AddTransactionDialogProps)
             
             <div className="space-y-2">
               <label className="text-sm font-medium">Ativo</label>
-              {category === 'Ações' ? (
+              {category === 'Ações' || category === 'FIIs' ? (
                 <Autocomplete 
                   options={stockOptions}
                   value={assetTickerInput}
                   onChange={setAssetTickerInput}
                   onOptionSelect={handleStockSelect}
-                  placeholder={isLoading ? "Carregando..." : "Digite o código da ação"}
-                  emptyMessage="Nenhum ativo encontrado"
+                  placeholder={isLoading ? "Carregando..." : `Digite o código do ${category === 'Ações' ? 'ativo' : 'fundo'}`}
+                  emptyMessage={`Nenhum ${category === 'Ações' ? 'ativo' : 'fundo'} encontrado`}
+                  isLoading={isLoading}
                 />
               ) : (
                 <Input 
-                  placeholder="PETR4" 
+                  placeholder={category === 'Cripto' ? "BTC" : "Nome do ativo"} 
                   value={assetTickerInput}
                   onChange={(e) => setAssetTickerInput(e.target.value)}
                 />

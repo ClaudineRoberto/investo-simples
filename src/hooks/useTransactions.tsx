@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 
 // Transaction data type
@@ -146,8 +145,16 @@ export const typeLabels: Record<string, string> = {
   interest: 'Juros',
 };
 
+export const categoryTypes: Record<string, string> = {
+  'Ações': 'stock',
+  'FIIs': 'fund',
+  'BDRs': 'bdr',
+  'Renda Fixa': 'fixed_income',
+  'Cripto': 'crypto',
+};
+
 export const useTransactions = () => {
-  const [transactions] = useState<Transaction[]>(mockTransactions);
+  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
 
   // Get unique categories and brokers for filters
   const categories = Array.from(new Set(transactions.map(t => t.category)));
@@ -175,10 +182,21 @@ export const useTransactions = () => {
     });
   };
 
-  const addTransaction = (transaction: Omit<Transaction, 'id'>) => {
-    // Na versão atual, apenas simulamos a adição - você pode implementar
-    // a lógica real de adição ao banco de dados ou estado quando necessário
-    console.log('Adicionando transação:', transaction);
+  const addTransaction = (transaction: Omit<Transaction, 'id' | 'total'>) => {
+    // Calculando o total com base em quantidade e preço
+    const total = transaction.type === 'dividend' || transaction.type === 'interest'
+      ? transaction.price // Para dividendos e juros, o preço é o valor total
+      : transaction.quantity * transaction.price;
+    
+    const newTransaction: Transaction = {
+      id: Math.max(0, ...transactions.map(t => t.id)) + 1,
+      ...transaction,
+      total
+    };
+    
+    setTransactions(prev => [newTransaction, ...prev]);
+    
+    return newTransaction;
   };
 
   return {
@@ -186,6 +204,7 @@ export const useTransactions = () => {
     categories,
     brokers,
     typeLabels,
+    categoryTypes,
     filterTransactions,
     addTransaction
   };
