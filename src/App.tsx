@@ -1,6 +1,5 @@
 
 import { Toaster } from "sonner";
-import { TooltipProvider } from "@heroui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
@@ -68,33 +67,31 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <TooltipProvider>
-          <Toaster richColors position="top-right" />
-          <BrowserRouter>
-            <AuthProvider>
-              <AnimatePresence mode="wait">
-                <Routes>
-                  {/* Auth routes */}
-                  <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
-                  <Route path="/register" element={<AuthRoute><Register /></AuthRoute>} />
-                  <Route path="/forgot-password" element={<AuthRoute><ForgotPassword /></AuthRoute>} />
-                  
-                  {/* Protected routes */}
-                  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                  <Route path="/portfolio" element={<ProtectedRoute><Portfolio /></ProtectedRoute>} />
-                  <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
-                  <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-                  
-                  {/* Redirect root to dashboard or login */}
-                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                  
-                  {/* Catch-all route */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </AnimatePresence>
-            </AuthProvider>
-          </BrowserRouter>
-        </TooltipProvider>
+        <Toaster richColors position="top-right" />
+        <BrowserRouter>
+          <AuthProvider>
+            <AnimatePresence mode="wait">
+              <Routes>
+                {/* Auth routes */}
+                <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
+                <Route path="/register" element={<AuthRoute><Register /></AuthRoute>} />
+                <Route path="/forgot-password" element={<AuthRoute><ForgotPassword /></AuthRoute>} />
+                
+                {/* Protected routes */}
+                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/portfolio" element={<ProtectedRoute><Portfolio /></ProtectedRoute>} />
+                <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                
+                {/* Redirect root to dashboard or login */}
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                
+                {/* Catch-all route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AnimatePresence>
+          </AuthProvider>
+        </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>
   );

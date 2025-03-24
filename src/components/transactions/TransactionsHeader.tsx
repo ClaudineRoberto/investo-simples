@@ -6,7 +6,8 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-  Modal,
+  Modal, 
+  ModalContent,
   ModalTrigger,
 } from '@heroui/react';
 import {
@@ -142,18 +143,14 @@ const TransactionsHeader = ({
           Exportar
         </Button>
         
-        <Modal>
-          <ModalTrigger>
-            <Button 
-              color="primary" 
-              size="sm" 
-              startContent={<PlusCircle size={16} />}
-              onClick={openDialog}
-            >
-              Nova transação
-            </Button>
-          </ModalTrigger>
-        </Modal>
+        <Button 
+          color="primary" 
+          size="sm" 
+          startContent={<PlusCircle size={16} />}
+          onClick={openDialog}
+        >
+          Nova transação
+        </Button>
       </div>
     </div>
   );

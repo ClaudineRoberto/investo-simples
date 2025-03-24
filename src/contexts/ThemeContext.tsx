@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { NextUIProvider } from "@heroui/react";
+import { NextUIProvider } from "@nextui-org/react";
 
 type ThemeType = "light" | "dark";
 type ColorType = "blue" | "purple" | "green" | "red" | "orange" | "pink";

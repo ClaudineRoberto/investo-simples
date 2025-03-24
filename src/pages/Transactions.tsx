@@ -6,7 +6,6 @@ import TransactionsHeader from '@/components/transactions/TransactionsHeader';
 import TransactionsList from '@/components/transactions/TransactionsList';
 import AddTransactionDialog from '@/components/transactions/AddTransactionDialog';
 import { useTransactions, typeLabels } from '@/hooks/useTransactions';
-import { Container } from '@heroui/react';
 
 const Transactions = () => {
   const { categories, brokers, filterTransactions } = useTransactions();
@@ -28,7 +27,7 @@ const Transactions = () => {
     <div className="flex min-h-screen bg-background">
       <Sidebar />
       <div className="flex-1 md:ml-[280px]">
-        <Container className="py-6 md:py-8">
+        <div className="container py-6 md:py-8">
           <AnimatedTransition variant="fade" className="space-y-6">
             <TransactionsHeader
               searchQuery={searchQuery}
@@ -54,7 +53,7 @@ const Transactions = () => {
               onOpenChange={setOpen} 
             />
           </AnimatedTransition>
-        </Container>
+        </div>
       </div>
     </div>
   );
