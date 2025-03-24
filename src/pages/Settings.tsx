@@ -2,14 +2,14 @@
 import { Sidebar } from '@/components/layout/Sidebar';
 import AnimatedTransition from '@/components/ui-elements/AnimatedTransition';
 import ThemeSettings from '@/components/settings/ThemeSettings';
-import { Container, Card, CardHeader, CardBody, Divider } from '@heroui/react';
+import { Card, CardHeader, CardBody, Divider } from '@heroui/react';
 
 const Settings = () => {
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
       <div className="flex-1 md:ml-[280px]">
-        <Container className="py-6 md:py-8">
+        <div className="container py-6 md:py-8">
           <AnimatedTransition variant="fade" className="space-y-8">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Configurações</h1>
@@ -61,7 +61,7 @@ const Settings = () => {
               </Card>
             </div>
           </AnimatedTransition>
-        </Container>
+        </div>
       </div>
     </div>
   );

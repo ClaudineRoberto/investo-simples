@@ -1,6 +1,5 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { NextUIProvider } from "@nextui-org/react";
 
 type ThemeType = "light" | "dark";
 type ColorType = "blue" | "purple" | "green" | "red" | "orange" | "pink";
@@ -67,9 +66,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         setPrimaryColor: handleSetPrimaryColor 
       }}
     >
-      <NextUIProvider>
-        {children}
-      </NextUIProvider>
+      {children}
     </ThemeContext.Provider>
   );
 };

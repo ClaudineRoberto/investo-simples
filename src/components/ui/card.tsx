@@ -9,51 +9,27 @@ import {
 import { cn } from "@/lib/utils";
 
 // Card
-interface CardProps extends React.ComponentPropsWithoutRef<typeof HeroCard> {
-  className?: string;
-}
-
 const Card = React.forwardRef<
   HTMLDivElement,
-  CardProps
->(({ className, ...props }, ref) => {
-  return (
-    <HeroCard
-      ref={ref}
-      className={cn("", className)}
-      {...props}
-    />
-  );
+  React.ComponentPropsWithoutRef<typeof HeroCard>
+>((props, ref) => {
+  return <HeroCard ref={ref} {...props} />;
 });
 Card.displayName = "Card";
 
 // CardHeader
-interface CardHeaderProps extends React.ComponentPropsWithoutRef<typeof HeroCardHeader> {
-  className?: string;
-}
-
 const CardHeader = React.forwardRef<
   HTMLDivElement,
-  CardHeaderProps
->(({ className, ...props }, ref) => {
-  return (
-    <HeroCardHeader
-      ref={ref}
-      className={cn("", className)}
-      {...props}
-    />
-  );
+  React.ComponentPropsWithoutRef<typeof HeroCardHeader>
+>((props, ref) => {
+  return <HeroCardHeader ref={ref} {...props} />;
 });
 CardHeader.displayName = "CardHeader";
 
 // CardTitle
-interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
-  className?: string;
-}
-
 const CardTitle = React.forwardRef<
   HTMLHeadingElement,
-  CardTitleProps
+  React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => {
   return (
     <h3
@@ -66,13 +42,9 @@ const CardTitle = React.forwardRef<
 CardTitle.displayName = "CardTitle";
 
 // CardDescription
-interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
-  className?: string;
-}
-
 const CardDescription = React.forwardRef<
   HTMLParagraphElement,
-  CardDescriptionProps
+  React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => {
   return (
     <p
@@ -85,40 +57,20 @@ const CardDescription = React.forwardRef<
 CardDescription.displayName = "CardDescription";
 
 // CardContent
-interface CardContentProps extends React.ComponentPropsWithoutRef<typeof HeroCardBody> {
-  className?: string;
-}
-
 const CardContent = React.forwardRef<
   HTMLDivElement,
-  CardContentProps
->(({ className, ...props }, ref) => {
-  return (
-    <HeroCardBody
-      ref={ref}
-      className={cn("", className)}
-      {...props}
-    />
-  );
+  React.ComponentPropsWithoutRef<typeof HeroCardBody>
+>((props, ref) => {
+  return <HeroCardBody ref={ref} {...props} />;
 });
 CardContent.displayName = "CardContent";
 
 // CardFooter
-interface CardFooterProps extends React.ComponentPropsWithoutRef<typeof HeroCardFooter> {
-  className?: string;
-}
-
 const CardFooter = React.forwardRef<
   HTMLDivElement,
-  CardFooterProps
->(({ className, ...props }, ref) => {
-  return (
-    <HeroCardFooter
-      ref={ref}
-      className={cn("", className)}
-      {...props}
-    />
-  );
+  React.ComponentPropsWithoutRef<typeof HeroCardFooter>
+>((props, ref) => {
+  return <HeroCardFooter ref={ref} {...props} />;
 });
 CardFooter.displayName = "CardFooter";
 

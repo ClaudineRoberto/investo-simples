@@ -5,20 +5,21 @@ import { cn } from "@/lib/utils";
 
 interface CheckboxProps {
   className?: string;
-  isSelected?: boolean;
-  onValueChange?: (isSelected: boolean) => void;
+  checked?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
+  [key: string]: any;
 }
 
 const Checkbox = React.forwardRef<
   HTMLInputElement,
   CheckboxProps
->(({ className, isSelected, onValueChange, ...props }, ref) => {
+>(({ className, checked, onCheckedChange, ...props }, ref) => {
   return (
     <HeroCheckbox
       ref={ref}
       className={cn("peer", className)}
-      isSelected={isSelected}
-      onValueChange={onValueChange}
+      isSelected={checked}
+      onValueChange={onCheckedChange}
       {...props}
     />
   );
