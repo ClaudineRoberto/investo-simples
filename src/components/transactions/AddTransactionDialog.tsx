@@ -19,7 +19,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Autocomplete, type AutocompleteOption } from '@/components/ui/autocomplete';
-import { searchBovespaStocks } from '@/data/bovespaStocks';
+import { searchStocks } from '@/services/brapiService';
+import { toast } from 'sonner';
 
 interface AddTransactionDialogProps {
   open: boolean;
@@ -37,21 +38,39 @@ const AddTransactionDialog = ({ open, onOpenChange }: AddTransactionDialogProps)
   const [broker, setBroker] = useState('XP Investimentos');
   
   const [stockOptions, setStockOptions] = useState<AutocompleteOption[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (assetTickerInput.length > 1) {
-      const results = searchBovespaStocks(assetTickerInput);
-      setStockOptions(
-        results.map(stock => ({
-          value: stock.ticker,
-          label: stock.ticker,
-          detail: stock.name
-        }))
-      );
-    } else {
-      setStockOptions([]);
-    }
-  }, [assetTickerInput]);
+    const fetchStocks = async () => {
+      if (assetTickerInput.length > 1 && category === 'Ações') {
+        setIsLoading(true);
+        try {
+          const stocks = await searchStocks(assetTickerInput);
+          setStockOptions(
+            stocks.map(stock => ({
+              value: stock.symbol,
+              label: stock.symbol,
+              detail: stock.shortName || stock.longName || ''
+            }))
+          );
+        } catch (error) {
+          console.error('Erro ao buscar ações:', error);
+          setStockOptions([]);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setStockOptions([]);
+      }
+    };
+
+    // Usar um timeout para evitar muitas chamadas API durante a digitação
+    const timeoutId = setTimeout(() => {
+      fetchStocks();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [assetTickerInput, category]);
 
   const handleStockSelect = (option: AutocompleteOption) => {
     setAssetTickerInput(option.value);
@@ -74,6 +93,24 @@ const AddTransactionDialog = ({ open, onOpenChange }: AddTransactionDialogProps)
     setQuantity('');
     setPrice('');
     setBroker('XP Investimentos');
+    setStockOptions([]);
+  };
+
+  const handleSave = () => {
+    // Verificações básicas
+    if (!assetTickerInput || !assetName) {
+      toast.error('Por favor, informe o ativo');
+      return;
+    }
+
+    if (transactionType !== 'dividend' && transactionType !== 'interest' && (!quantity || !price)) {
+      toast.error('Por favor, informe a quantidade e o preço');
+      return;
+    }
+
+    // Aqui você poderia implementar a lógica para salvar a transação
+    toast.success('Transação registrada com sucesso!');
+    onOpenChange(false);
   };
   
   return (
@@ -143,7 +180,7 @@ const AddTransactionDialog = ({ open, onOpenChange }: AddTransactionDialogProps)
                   value={assetTickerInput}
                   onChange={setAssetTickerInput}
                   onOptionSelect={handleStockSelect}
-                  placeholder="Digite o ticker (ex: PETR4)"
+                  placeholder={isLoading ? "Carregando..." : "Digite o código da ação"}
                   emptyMessage="Nenhum ativo encontrado"
                 />
               ) : (
@@ -173,6 +210,7 @@ const AddTransactionDialog = ({ open, onOpenChange }: AddTransactionDialogProps)
                 placeholder="100" 
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
+                disabled={transactionType === 'dividend' || transactionType === 'interest'}
               />
             </div>
             
@@ -184,6 +222,7 @@ const AddTransactionDialog = ({ open, onOpenChange }: AddTransactionDialogProps)
                 placeholder="32.50" 
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
+                disabled={transactionType === 'dividend' || transactionType === 'interest'}
               />
             </div>
           </div>
@@ -210,7 +249,7 @@ const AddTransactionDialog = ({ open, onOpenChange }: AddTransactionDialogProps)
         
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-          <Button onClick={() => onOpenChange(false)}>Salvar</Button>
+          <Button onClick={handleSave}>Salvar</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

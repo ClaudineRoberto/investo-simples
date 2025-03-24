@@ -175,11 +175,18 @@ export const useTransactions = () => {
     });
   };
 
+  const addTransaction = (transaction: Omit<Transaction, 'id'>) => {
+    // Na versão atual, apenas simulamos a adição - você pode implementar
+    // a lógica real de adição ao banco de dados ou estado quando necessário
+    console.log('Adicionando transação:', transaction);
+  };
+
   return {
     transactions,
     categories,
     brokers,
     typeLabels,
-    filterTransactions
+    filterTransactions,
+    addTransaction
   };
 };

@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface AutocompleteOption {
@@ -21,6 +21,7 @@ interface AutocompleteProps {
   emptyMessage?: string;
   disabled?: boolean;
   className?: string;
+  isLoading?: boolean;
 }
 
 export function Autocomplete({
@@ -31,7 +32,8 @@ export function Autocomplete({
   placeholder = "Search...",
   emptyMessage = "No results found.",
   disabled = false,
-  className
+  className,
+  isLoading = false
 }: AutocompleteProps) {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState(value);
@@ -70,14 +72,18 @@ export function Autocomplete({
             onChange={handleInputChange}
             placeholder={placeholder}
             disabled={disabled}
-            className={cn("w-full", className)}
+            className={cn("w-full pr-10", className)}
             onClick={() => options.length > 0 && setOpen(true)}
             onFocus={() => options.length > 0 && setOpen(true)}
           />
-          <ChevronsUpDown 
-            className="absolute right-3 top-3 h-4 w-4 shrink-0 opacity-50" 
-            onClick={() => setOpen(!open)}
-          />
+          {isLoading ? (
+            <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin opacity-70" />
+          ) : (
+            <ChevronsUpDown 
+              className="absolute right-3 top-3 h-4 w-4 shrink-0 opacity-50" 
+              onClick={() => setOpen(!open)}
+            />
+          )}
         </div>
       </PopoverTrigger>
       <PopoverContent 
