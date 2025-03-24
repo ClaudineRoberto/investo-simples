@@ -8,7 +8,6 @@ import {
   DropdownItem,
   Modal, 
   ModalContent,
-  ModalTrigger,
 } from '@heroui/react';
 import {
   Search,
