@@ -1,10 +1,10 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "sonner";
+import { TooltipProvider } from "@heroui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
 
@@ -65,42 +65,37 @@ const AuthRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => {
-  // Set theme based on user preference
-  useEffect(() => {
-    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    document.documentElement.classList.toggle('dark', isDarkMode);
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AuthProvider>
-            <AnimatePresence mode="wait">
-              <Routes>
-                {/* Auth routes */}
-                <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
-                <Route path="/register" element={<AuthRoute><Register /></AuthRoute>} />
-                <Route path="/forgot-password" element={<AuthRoute><ForgotPassword /></AuthRoute>} />
-                
-                {/* Protected routes */}
-                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                <Route path="/portfolio" element={<ProtectedRoute><Portfolio /></ProtectedRoute>} />
-                <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
-                <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-                
-                {/* Redirect root to dashboard or login */}
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                
-                {/* Catch-all route */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </AnimatePresence>
-          </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
+      <ThemeProvider>
+        <TooltipProvider>
+          <Toaster richColors position="top-right" />
+          <BrowserRouter>
+            <AuthProvider>
+              <AnimatePresence mode="wait">
+                <Routes>
+                  {/* Auth routes */}
+                  <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
+                  <Route path="/register" element={<AuthRoute><Register /></AuthRoute>} />
+                  <Route path="/forgot-password" element={<AuthRoute><ForgotPassword /></AuthRoute>} />
+                  
+                  {/* Protected routes */}
+                  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                  <Route path="/portfolio" element={<ProtectedRoute><Portfolio /></ProtectedRoute>} />
+                  <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
+                  <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                  
+                  {/* Redirect root to dashboard or login */}
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  
+                  {/* Catch-all route */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </AnimatePresence>
+            </AuthProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };

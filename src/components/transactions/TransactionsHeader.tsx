@@ -1,23 +1,14 @@
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
+  Input,
+  Button,
+  Dropdown,
+  DropdownTrigger,
   DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Dialog,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+  DropdownItem,
+  Modal,
+  ModalTrigger,
+} from '@heroui/react';
 import {
   Search,
   Filter,
@@ -53,94 +44,116 @@ const TransactionsHeader = ({
   openDialog,
 }: TransactionsHeaderProps) => {
   return (
-    <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+    <div className="flex flex-col gap-4 md:flex-row md:items-center justify-between">
       <h1 className="text-3xl font-bold tracking-tight">Transações</h1>
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar transação..."
-            className="pl-8 w-full sm:w-[200px]"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+        <Input
+          placeholder="Buscar transação..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          startContent={<Search className="text-default-300" size={18} />}
+          className="w-full sm:w-[200px]"
+        />
         
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="h-9 gap-1">
-              <Filter size={16} />
+        <Dropdown>
+          <DropdownTrigger>
+            <Button 
+              variant="flat" 
+              size="sm" 
+              startContent={<Filter size={16} />}
+            >
               Filtros
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[200px]">
-            <div className="p-2">
-              <div className="mb-2">
-                <p className="text-xs font-medium mb-1">Tipo</p>
-                <Select value={typeFilter} onValueChange={setTypeFilter}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Todos os tipos" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos os tipos</SelectItem>
-                    <SelectItem value="buy">Compras</SelectItem>
-                    <SelectItem value="sell">Vendas</SelectItem>
-                    <SelectItem value="dividend">Dividendos</SelectItem>
-                    <SelectItem value="interest">Juros</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="mb-2">
-                <p className="text-xs font-medium mb-1">Categoria</p>
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Todas as categorias" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas as categorias</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+          </DropdownTrigger>
+          <DropdownMenu variant="flat" aria-label="Filtros de transações" className="p-4 w-72">
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-medium mb-2">Tipo</h4>
+                <Dropdown>
+                  <DropdownTrigger>
+                    <Button variant="bordered" size="sm" className="w-full justify-between">
+                      {typeFilter === 'all' ? 'Todos os tipos' : 
+                       typeFilter === 'buy' ? 'Compras' :
+                       typeFilter === 'sell' ? 'Vendas' :
+                       typeFilter === 'dividend' ? 'Dividendos' : 'Juros'}
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu 
+                    onAction={(key) => setTypeFilter(key as string)}
+                    selectedKeys={[typeFilter]}
+                  >
+                    <DropdownItem key="all">Todos os tipos</DropdownItem>
+                    <DropdownItem key="buy">Compras</DropdownItem>
+                    <DropdownItem key="sell">Vendas</DropdownItem>
+                    <DropdownItem key="dividend">Dividendos</DropdownItem>
+                    <DropdownItem key="interest">Juros</DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
               </div>
               
               <div>
-                <p className="text-xs font-medium mb-1">Corretora</p>
-                <Select value={brokerFilter} onValueChange={setBrokerFilter}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Todas as corretoras" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas as corretoras</SelectItem>
-                    {brokers.map((broker) => (
-                      <SelectItem key={broker} value={broker}>
-                        {broker}
-                      </SelectItem>
+                <h4 className="text-sm font-medium mb-2">Categoria</h4>
+                <Dropdown>
+                  <DropdownTrigger>
+                    <Button variant="bordered" size="sm" className="w-full justify-between">
+                      {categoryFilter === 'all' ? 'Todas as categorias' : categoryFilter}
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu 
+                    onAction={(key) => setCategoryFilter(key as string)}
+                    selectedKeys={[categoryFilter]}
+                  >
+                    <DropdownItem key="all">Todas as categorias</DropdownItem>
+                    {categories.map((category) => (
+                      <DropdownItem key={category}>{category}</DropdownItem>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </DropdownMenu>
+                </Dropdown>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium mb-2">Corretora</h4>
+                <Dropdown>
+                  <DropdownTrigger>
+                    <Button variant="bordered" size="sm" className="w-full justify-between">
+                      {brokerFilter === 'all' ? 'Todas as corretoras' : brokerFilter}
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu 
+                    onAction={(key) => setBrokerFilter(key as string)}
+                    selectedKeys={[brokerFilter]}
+                  >
+                    <DropdownItem key="all">Todas as corretoras</DropdownItem>
+                    {brokers.map((broker) => (
+                      <DropdownItem key={broker}>{broker}</DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </Dropdown>
               </div>
             </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </DropdownMenu>
+        </Dropdown>
         
-        <Button variant="outline" size="sm" className="h-9 gap-1">
-          <Download size={16} />
+        <Button 
+          variant="flat" 
+          size="sm" 
+          startContent={<Download size={16} />}
+        >
           Exportar
         </Button>
         
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button size="sm" className="h-9 gap-1" onClick={openDialog}>
-              <PlusCircle size={16} />
+        <Modal>
+          <ModalTrigger>
+            <Button 
+              color="primary" 
+              size="sm" 
+              startContent={<PlusCircle size={16} />}
+              onClick={openDialog}
+            >
               Nova transação
             </Button>
-          </DialogTrigger>
-        </Dialog>
+          </ModalTrigger>
+        </Modal>
       </div>
     </div>
   );

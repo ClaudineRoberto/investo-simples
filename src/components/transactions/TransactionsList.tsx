@@ -1,13 +1,11 @@
 
-import { useState } from 'react';
 import {
   Card,
-  CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+  CardBody,
+  Chip,
+  Avatar,
+} from '@heroui/react';
 
 type Transaction = {
   id: number;
@@ -35,111 +33,81 @@ const TransactionsList = ({ transactions, typeLabels }: TransactionsListProps) =
     }).format(value);
   };
 
-  const getTransactionIcon = (type: string) => {
+  const getTransactionColor = (type: string) => {
     switch (type) {
       case 'buy':
-        return (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/20">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="h-4 w-4"
-            >
-              <path
-                fillRule="evenodd"
-                d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-        );
+        return "success";
       case 'sell':
-        return (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-900/20">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="h-4 w-4"
-            >
-              <path
-                fillRule="evenodd"
-                d="M14.78 11.78a.75.75 0 0 0-1.06 0L10 15.44l-3.72-3.72a.75.75 0 1 0-1.06 1.06l4.25 4.25a.75.75 0 0 0 1.06 0l4.25-4.25a.75.75 0 0 0 0-1.06Z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-        );
+        return "danger";
       case 'dividend':
       case 'interest':
-        return (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/20">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="h-4 w-4"
-            >
-              <path
-                fillRule="evenodd"
-                d="M1 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4Zm12 4a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM4 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm13-1a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM1.75 14.5a.75.75 0 0 0 0 1.5c4.417 0 8.693.603 12.749 1.73 1.111.309 2.251-.512 2.251-1.696v-.784a.75.75 0 0 0-1.5 0v.784a.272.272 0 0 1-.35.25A49.043 49.043 0 0 0 1.75 14.5Z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-        );
+        return "primary";
       default:
-        return null;
+        return "default";
     }
   };
 
   return (
-    <Card className="glass-card">
-      <CardHeader className="pb-3">
-        <CardTitle>Histórico de transações</CardTitle>
-        <CardDescription>
+    <Card className="shadow-sm">
+      <CardHeader className="flex flex-col gap-1">
+        <h3 className="text-xl font-bold">Histórico de transações</h3>
+        <p className="text-default-500">
           Visualize todas as suas operações de compra, venda e recebimentos
-        </CardDescription>
+        </p>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+      <CardBody>
+        <div className="space-y-3">
           {transactions.map((transaction) => (
             <div
               key={transaction.id}
-              className="flex items-center justify-between rounded-lg p-3 transition-colors hover:bg-muted/50"
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-lg p-3 transition-colors hover:bg-default-100 dark:hover:bg-default-50/10"
             >
-              <div className="flex items-center space-x-4">
-                {getTransactionIcon(transaction.type)}
+              <div className="flex items-center gap-4">
+                <Avatar
+                  radius="lg"
+                  size="md"
+                  color={getTransactionColor(transaction.type)}
+                  isBordered
+                  fallback={transaction.asset.charAt(0)}
+                />
                 <div>
                   <div className="font-medium">
                     {transaction.asset} - {transaction.name}
                   </div>
-                  <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                  <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-default-500">
                     <span>{new Date(transaction.date).toLocaleDateString('pt-BR')}</span>
-                    <Badge variant="outline" className="text-xs">
+                    <Chip 
+                      size="sm" 
+                      color={getTransactionColor(transaction.type)}
+                      variant="flat"
+                      className="text-xs"
+                    >
                       {typeLabels[transaction.type]}
-                    </Badge>
-                    <Badge variant="outline" className="text-xs">
+                    </Chip>
+                    <Chip 
+                      size="sm" 
+                      variant="flat"
+                      className="text-xs"
+                    >
                       {transaction.category}
-                    </Badge>
+                    </Chip>
                   </div>
                 </div>
               </div>
               <div className="text-right">
-                <div className="font-medium">
+                <div className={`font-medium ${transaction.type === 'buy' ? 'text-danger' : 'text-success'}`}>
                   {transaction.type === 'buy'
                     ? `-${formatCurrency(transaction.total)}`
                     : `+${formatCurrency(transaction.total)}`}
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-default-500">
                   {transaction.broker}
                 </div>
               </div>
             </div>
           ))}
         </div>
-      </CardContent>
+      </CardBody>
     </Card>
   );
 };
