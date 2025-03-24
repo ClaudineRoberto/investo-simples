@@ -50,6 +50,7 @@ export const searchStocks = async (query: string): Promise<BrapiStock[]> => {
     
     // API retorna dados no campo "stocks" no endpoint list
     const stocks = data.stocks || [];
+    console.log('Search stocks result:', stocks);
     
     // Normaliza os dados para manter compatibilidade com o restante da aplicação
     return stocks.map(stock => ({
@@ -74,11 +75,21 @@ export const searchStocks = async (query: string): Promise<BrapiStock[]> => {
  */
 export const searchStocksByType = async (type: string, query: string = ""): Promise<BrapiStock[]> => {
   try {
-    let url = `${BRAPI_BASE_URL}/quote/list?token=${BRAPI_TOKEN}&type=${type}`;
+    if (query && query.length < 2) {
+      return [];
+    }
+    
+    let url = `${BRAPI_BASE_URL}/quote/list?token=${BRAPI_TOKEN}`;
+    
+    if (type) {
+      url += `&type=${type}`;
+    }
     
     if (query && query.length >= 2) {
       url += `&search=${encodeURIComponent(query)}`;
     }
+    
+    console.log('Fetching from URL:', url);
     
     const response = await fetch(url);
     
@@ -87,6 +98,7 @@ export const searchStocksByType = async (type: string, query: string = ""): Prom
     }
     
     const data: BrapiStockResponse = await response.json();
+    console.log('API response:', data);
     
     // API retorna dados no campo "stocks" no endpoint list
     const stocks = data.stocks || [];

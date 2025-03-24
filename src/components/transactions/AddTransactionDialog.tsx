@@ -19,8 +19,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Autocomplete, type AutocompleteOption } from '@/components/ui/autocomplete';
-import { searchStocks, searchStocksByType } from '@/services/brapiService';
+import { searchStocks, searchStocksByType, type BrapiStock } from '@/services/brapiService';
 import { toast } from 'sonner';
+import { categoryTypes } from '@/hooks/useTransactions';
 
 interface AddTransactionDialogProps {
   open: boolean;
@@ -42,23 +43,30 @@ const AddTransactionDialog = ({ open, onOpenChange }: AddTransactionDialogProps)
 
   useEffect(() => {
     const fetchAssets = async () => {
-      if (assetTickerInput.length > 1) {
+      if (assetTickerInput.length >= 2) {
         setIsLoading(true);
         try {
-          let assets = [];
+          let assets: BrapiStock[] = [];
           
+          let apiType = '';
           if (category === 'Ações') {
-            assets = await searchStocksByType('stock', assetTickerInput);
+            apiType = 'stock';
           } else if (category === 'FIIs') {
-            assets = await searchStocksByType('fund', assetTickerInput);
-          } else if (category === 'Cripto') {
-            // Aqui você poderia implementar uma busca específica para criptomoedas
-            // ou manter a busca genérica
-            assets = await searchStocks(assetTickerInput);
+            apiType = 'fund';
+          } else if (category === 'BDRs') {
+            apiType = 'bdr';
+          }
+          
+          if (apiType) {
+            console.log(`Searching for assets of type ${apiType} with query ${assetTickerInput}`);
+            assets = await searchStocksByType(apiType, assetTickerInput);
           } else {
-            // Para outras categorias ou busca genérica
+            // For other categories or general search
+            console.log(`General search for assets with query ${assetTickerInput}`);
             assets = await searchStocks(assetTickerInput);
           }
+          
+          console.log('Assets found:', assets);
           
           setStockOptions(
             assets.map(asset => ({
